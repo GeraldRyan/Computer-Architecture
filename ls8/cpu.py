@@ -7,16 +7,20 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        self.memory=[0]*256
+        self.ram=[0]*256
         self.register = [0] * 8
         self.pc = 0
 
-    def ram_read(self):
-        pass
+    def ram_read(self, MAR):
+        return self.ram[MAR]
 
 
-    def ram_write(self):
-        pass
+    def ram_write(self, MDR, MAR):
+        try:
+            self.ram[MAR] = MDR
+            return True
+        except:
+            return False
 
 
     def load(self):
@@ -72,4 +76,32 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        IR = self.ram[self.pc]
+        operand_a = self.ram[self.pc+1]; operand_b = self.ram[self.pc+2]; print("IR", IR, "operand A/B", operand_a, operand_b)
+        a = bin(IR)[2:][:2]; b = bin(IR)[2:][2:3]; c = bin(IR)[2:][3:4]; d = bin(IR)[2:][4:]; print(f"a: {a}, b: {b}, c: {c}, d: {d}")
+        self.pc += int(a,2); print("self.pc", self.pc)
+        # if IR == 0b10000010:
+            
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+        
+    cpu = CPU()
+    print(cpu.ram_read(4))
+    cpu.ram_write(5,4)
+    print(cpu.ram_read(4))
+    cpu.run()
+    while True:
+        x = input("Enter a command: ")
+        if x == 'q':
+            quit()
+        try:
+            x
+        except:
+            print("error")
