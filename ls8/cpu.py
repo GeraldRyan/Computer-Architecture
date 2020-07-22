@@ -39,6 +39,12 @@ class CPU:
             0b00000000,
             0b00000001, # HLT
         ]
+        try:
+            print('argv', sys.argv[1])
+        except:
+            print("please enter a valid path to a program file")
+            sys.exit(0)
+
 
         with open(sys.argv[1]) as f:
             program.clear()
@@ -52,7 +58,6 @@ class CPU:
                 # print(repr("{0:b}".format(line)))
                 program.append(line)
 
-        # sys.exit(0)
 
 
 
