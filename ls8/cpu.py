@@ -79,8 +79,12 @@ class CPU:
         IR = self.ram[self.pc]
         operand_a = self.ram[self.pc+1]; operand_b = self.ram[self.pc+2]; print("IR", IR, "operand A/B", operand_a, operand_b)
         a = bin(IR)[2:][:2]; b = bin(IR)[2:][2:3]; c = bin(IR)[2:][3:4]; d = bin(IR)[2:][4:]; print(f"a: {a}, b: {b}, c: {c}, d: {d}")
-        self.pc += int(a,2); print("self.pc", self.pc)
-        # if IR == 0b10000010:
+        self.pc += int(a,2) + 1; print("self.pc", self.pc) 
+        
+        if IR == 0b10000010: # LDI register immediate
+            self.register[int(format(operand_a, '08b')[-3:])] = operand_b
+            print("register", self.register)
+
             
 
 
