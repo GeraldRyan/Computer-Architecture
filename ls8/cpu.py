@@ -30,19 +30,6 @@ class CPU:
 
         # For now, we've just hardcoded a program:
         
-        with open(sys.argv[1]) as f:
-            for line in f:
-                line = line.split("#")[0] # wrap inside int() when all input is right type
-                line = line.strip()
-                # print(line)
-                if line == "":
-                    continue
-                line = int(line, 2)
-                print(repr("{0:b}".format(line)))
-
-        sys.exit(0)
-
-
         program = [
             # From print8.ls8
             0b10000010, # LDI R0,8
@@ -53,8 +40,22 @@ class CPU:
             0b00000001, # HLT
         ]
 
-        # program = sys.argv[1]
-        # print("sys.argv[1]", program)
+        with open(sys.argv[1]) as f:
+            program.clear()
+            for line in f:
+                line = line.split("#")[0] # wrap inside int() when all input is right type
+                line = line.strip()
+                # print(line)
+                if line == "":
+                    continue
+                line = int(line, 2)
+                # print(repr("{0:b}".format(line)))
+                program.append(line)
+
+        # sys.exit(0)
+
+
+
 
 
         for instruction in program:
