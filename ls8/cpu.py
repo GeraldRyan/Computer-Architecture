@@ -39,24 +39,28 @@ class CPU:
             0b00000000,
             0b00000001, # HLT
         ]
-        try:
-            print('argv', sys.argv[1])
-        except:
-            print("please enter a valid path to a program file")
-            sys.exit(0)
 
+        try: # Why is this try except block not working?
+            print("sys", sys.argv[1])
+            with open(sys.argv[1]) as f:
+                program.clear()
+                for line in f:
+                    line = line.split("#")[0] # wrap inside int() when all input is right type
+                    line = line.strip()
+                    # print(line)
+                    if line == "":
+                        continue
+                    line = int(line, 2)
+                    # print(repr("{0:b}".format(line)))
+                    program.append(line)
+        # except sys.argv[1] == "":
+        #     print("Please enter a valid file path")
+        except IndexError:
+            print("Please enter a filepath")
 
-        with open(sys.argv[1]) as f:
-            program.clear()
-            for line in f:
-                line = line.split("#")[0] # wrap inside int() when all input is right type
-                line = line.strip()
-                # print(line)
-                if line == "":
-                    continue
-                line = int(line, 2)
-                # print(repr("{0:b}".format(line)))
-                program.append(line)
+        except FileNotFoundError:
+            print(f"Couldn't find file {sys.argv[1]} or path not entered")
+        sys.exit(1)
 
 
 
@@ -72,8 +76,10 @@ class CPU:
         """ALU operations."""
 
         if op == "ADD":
-            self.reg[reg_a] += self.reg[reg_b]
+            self.register[reg_a] += self.register[reg_b]
         #elif op == "SUB": etc
+        elif op=="MUL":
+            self.register[reg_a] *= self.register[reg_b] 
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -134,15 +140,11 @@ class CPU:
             elif IR == 0b01000111: # Print value of register in operand a
                 print(f"Value in register {operand_a}: {self.register[operand_a]}")
             elif IR == 0b10100010: # multiply registers addressed as opearnds A and B - stores in register of op a
-                self.register[operand_a] = self.register[operand_a] * self.register[operand_b] 
+                self.alu('MUL', operand_a, operand_b)
+            elif IR == 0b10100000: # Add Registers opA and opB
+                self.alu("ADD", operand_a, operand_b)
 
             
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
