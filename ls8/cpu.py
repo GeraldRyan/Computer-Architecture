@@ -32,6 +32,7 @@ class CPU:
         
         with open(sys.argv[1]) as f:
             for line in f:
+                line = line.strip()
                 print(line)
 
         sys.exit(0)
