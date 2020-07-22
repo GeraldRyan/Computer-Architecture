@@ -29,6 +29,13 @@ class CPU:
         address = 0
 
         # For now, we've just hardcoded a program:
+        
+        with open('examples/print8.ls8') as f:
+            for line in f:
+                print(line)
+
+        sys.exit(0)
+
 
         program = [
             # From print8.ls8
@@ -39,6 +46,10 @@ class CPU:
             0b00000000,
             0b00000001, # HLT
         ]
+
+        # program = sys.argv[1]
+        # print("sys.argv[1]", program)
+
 
         for instruction in program:
             self.ram[address] = instruction
@@ -93,7 +104,11 @@ class CPU:
             # print("IR", IR, "operand A/B", operand_a, operand_b)
             a = format(IR, '08b')[:2]; b = format(IR, '08b')[2:3]; c = format(IR, '08b')[2:][3:4]; d = format(IR, '08b')[2:][4:]
             # print(f"a: {a}, b: {b}, c: {c}, d: {d}")
-            self.pc += int(a,2) + 1
+            number_operands = (IR & 0b11000000) >> 6
+
+
+            # self.pc += int(a,2) + 1 # Naive implementation
+            self.pc += number_operands + 1
             # print("self.pc", self.pc) 
 
 
@@ -104,7 +119,7 @@ class CPU:
             elif IR == 0b10000010: # LDI register immediate
                 self.register[int(format(operand_a, '08b')[-3:])] = operand_b
                 # print("register", self.register)
-            elif IR == 0b01000111:
+            elif IR == 0b01000111: # Print value of register in operand a
                 print(f"Value in register {operand_a}: {self.register[operand_a]}")
 
             
