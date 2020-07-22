@@ -133,6 +133,8 @@ class CPU:
                 # print("register", self.register)
             elif IR == 0b01000111: # Print value of register in operand a
                 print(f"Value in register {operand_a}: {self.register[operand_a]}")
+            elif IR == 0b10100010: # multiply registers addressed as opearnds A and B - stores in register of op a
+                self.register[operand_a] = self.register[operand_a] * self.register[operand_b] 
 
             
 
