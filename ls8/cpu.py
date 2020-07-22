@@ -32,8 +32,13 @@ class CPU:
         
         with open(sys.argv[1]) as f:
             for line in f:
+                line = line.split("#")[0] # wrap inside int() when all input is right type
                 line = line.strip()
-                print(line)
+                # print(line)
+                if line == "":
+                    continue
+                line = int(line, 2)
+                print(repr("{0:b}".format(line)))
 
         sys.exit(0)
 
