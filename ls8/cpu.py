@@ -78,16 +78,34 @@ class CPU:
         """Run the CPU."""
         # Set up the operands and increment the pc
 
-        IR = self.ram[self.pc]
-        operand_a = self.ram[self.pc+1]; operand_b = self.ram[self.pc+2]; print("IR", IR, "operand A/B", operand_a, operand_b)
-        a = bin(IR)[2:][:2]; b = bin(IR)[2:][2:3]; c = bin(IR)[2:][3:4]; d = bin(IR)[2:][4:]; print(f"a: {a}, b: {b}, c: {c}, d: {d}")
-        self.pc += int(a,2) + 1; print("self.pc", self.pc) 
         
         # Run the instructions
-        if IR == 0b10000010: # LDI register immediate
-            self.register[int(format(operand_a, '08b')[-3:])] = operand_b
-            print("register", self.register)
-        # elif: IR == 
+        running = True
+        while running:
+
+            if self.pc > len(self.ram)-3: ## safeguard. May not be necessary. HAVE TO USE format() NOT bin() or gets messed up. 
+                print("Stack Overflow! Program Terminated")
+                break
+
+
+            IR = self.ram[self.pc]
+            operand_a = self.ram[self.pc+1]; operand_b = self.ram[self.pc+2]
+            # print("IR", IR, "operand A/B", operand_a, operand_b)
+            a = format(IR, '08b')[:2]; b = format(IR, '08b')[2:3]; c = format(IR, '08b')[2:][3:4]; d = format(IR, '08b')[2:][4:]
+            # print(f"a: {a}, b: {b}, c: {c}, d: {d}")
+            self.pc += int(a,2) + 1
+            # print("self.pc", self.pc) 
+
+
+            
+            if IR == 0b00000001:
+                running = False 
+                print("Halted")
+            elif IR == 0b10000010: # LDI register immediate
+                self.register[int(format(operand_a, '08b')[-3:])] = operand_b
+                # print("register", self.register)
+            elif IR == 0b01000111:
+                print(f"Value in register {operand_a}: {self.register[operand_a]}")
 
             
 
