@@ -30,7 +30,7 @@ class CPU:
 
         # For now, we've just hardcoded a program:
         
-        with open('examples/print8.ls8') as f:
+        with open(sys.argv[1]) as f:
             for line in f:
                 print(line)
 
