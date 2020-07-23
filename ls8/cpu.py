@@ -14,6 +14,7 @@ class CPU:
         self.register = [0] * 8
         self.register[7] = 0xf4 # Stack Pointer (initialized to f4)
         self.pc = 0
+        self.sp = 7
         self.branchtable = {}
         self.running = True
         self.branchtable[0b00000001] = self.halt
@@ -26,17 +27,13 @@ class CPU:
 
     def push(self, reg_num, null):
         
-        self.register[7] -= 1 # Decrement stack pointer
-        self.ram[self.register[7]] = self.register[reg_num]
-        # print("Value line 31", self.register[reg_num])
+        self.register[self.sp] -= 1 # Decrement stack pointer
+        self.ram[self.register[self.sp]] = self.register[reg_num]
 
     def pop(self, reg, null):
 
-        self.register[reg] = self.ram[self.register[7]] 
-        self.register[7] +=1
-
-
-        
+        self.register[reg] = self.ram[self.register[self.sp]] 
+        self.register[self.sp] +=1
 
     def ram_read(self, MAR):
         return self.ram[MAR]
