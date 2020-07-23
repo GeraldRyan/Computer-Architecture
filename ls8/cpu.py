@@ -1,7 +1,10 @@
 """CPU functionality."""
 
 import sys
+import time
 
+start_time = time.time()
+print("start time", start_time)
 class CPU:
     """Main CPU class."""
 
@@ -9,7 +12,31 @@ class CPU:
         """Construct a new CPU."""
         self.ram=[0]*256
         self.register = [0] * 8
+        self.register[7] = 0xf4 # Stack Pointer (initialized to f4)
         self.pc = 0
+        self.branchtable = {}
+        self.running = True
+        self.branchtable[0b00000001] = self.halt
+        self.branchtable[0b10000010] = self.load_reg
+        self.branchtable[0b01000111] = self.print_reg
+        self.branchtable[0b10100010] = self.mult
+        self.branchtable[0b10100000] = self.add
+        self.branchtable[0b01000101] = self.push
+        self.branchtable[0b01000110] = self.pop
+
+    def push(self, reg_num, null):
+        
+        self.register[7] -= 1 # Decrement stack pointer
+        self.ram[self.register[7]] = self.register[reg_num]
+        # print("Value line 31", self.register[reg_num])
+
+    def pop(self, reg, null):
+
+        self.register[reg] = self.ram[self.register[7]] 
+        self.register[7] +=1
+
+
+        
 
     def ram_read(self, MAR):
         return self.ram[MAR]
@@ -21,6 +48,18 @@ class CPU:
             return True
         except:
             return False
+
+    def load_reg(self, op_a, op_b):
+        self.register[int(format(op_a, '08b')[-3:])] = op_b
+
+    def print_reg(self, op_a, null):
+        print(f"Value in register {op_a}: {self.register[op_a]}")
+
+    def mult(self, op_a, op_b):
+        self.alu('MUL', op_a, op_b)
+
+    def add(self, op_a, op_b):
+        self.alu("ADD", op_a, op_b)
 
 
     def load(self):
@@ -53,19 +92,12 @@ class CPU:
                     line = int(line, 2)
                     # print(repr("{0:b}".format(line)))
                     program.append(line)
-        # except sys.argv[1] == "":
-        #     print("Please enter a valid file path")
         except IndexError:
             print("Please enter a filepath")
-
+            sys.exit(1)
         except FileNotFoundError:
             print(f"Couldn't find file {sys.argv[1]} or path not entered")
-        sys.exit(1)
-
-
-
-
-
+            sys.exit(1)
 
         for instruction in program:
             self.ram[address] = instruction
@@ -83,6 +115,9 @@ class CPU:
         else:
             raise Exception("Unsupported ALU operation")
 
+
+    def halt(self, _, __):
+        self.running = False
     def trace(self):
         """
         Handy function to print out the CPU state. You might want to call this
@@ -109,43 +144,44 @@ class CPU:
 
         
         # Run the instructions
-        running = True
-        while running:
+        while self.running:
 
             if self.pc > len(self.ram)-3: ## safeguard. May not be necessary. HAVE TO USE format() NOT bin() or gets messed up. 
                 print("Stack Overflow! Program Terminated")
                 break
 
-
             IR = self.ram[self.pc]
-            operand_a = self.ram[self.pc+1]; operand_b = self.ram[self.pc+2]
-            # print("IR", IR, "operand A/B", operand_a, operand_b)
+            operand_a = self.ram[self.pc+1]; operand_b = self.ram[self.pc+2]; # print("IR", IR, "operand A/B", operand_a, operand_b)
             a = format(IR, '08b')[:2]; b = format(IR, '08b')[2:3]; c = format(IR, '08b')[2:][3:4]; d = format(IR, '08b')[2:][4:]
             # print(f"a: {a}, b: {b}, c: {c}, d: {d}")
             number_operands = (IR & 0b11000000) >> 6
 
-
             # self.pc += int(a,2) + 1 # Naive implementation
             self.pc += number_operands + 1
-            # print("self.pc", self.pc) 
+
+            use_branch_table = True
+            if use_branch_table == True:
+                self.branchtable[IR](operand_a, operand_b)
+            else:
+                # O(n) performance. 
+                if IR == 0b00000001:
+                    running = False 
+                    print("Halted")
+                elif IR == 0b10000010: # LDI register immediate
+                    self.register[int(format(operand_a, '08b')[-3:])] = operand_b
+                    # print("register", self.register)
+                elif IR == 0b01000111: # Print value of register in operand a
+                    print(f"Value in register {operand_a}: {self.register[operand_a]}")
+                elif IR == 0b10100010: # multiply registers addressed as opearnds A and B - stores in register of op a
+                    # bytecode[IR]("MUL", operand_a, operand_b)
+                    self.alu('MUL', operand_a, operand_b)
+                elif IR == 0b10100000: # Add Registers opA and opB
+                    self.alu("ADD", operand_a, operand_b)
 
 
-            
-            if IR == 0b00000001:
-                running = False 
-                print("Halted")
-            elif IR == 0b10000010: # LDI register immediate
-                self.register[int(format(operand_a, '08b')[-3:])] = operand_b
-                # print("register", self.register)
-            elif IR == 0b01000111: # Print value of register in operand a
-                print(f"Value in register {operand_a}: {self.register[operand_a]}")
-            elif IR == 0b10100010: # multiply registers addressed as opearnds A and B - stores in register of op a
-                self.alu('MUL', operand_a, operand_b)
-            elif IR == 0b10100000: # Add Registers opA and opB
-                self.alu("ADD", operand_a, operand_b)
 
-            
-
+end_time = time.time()
+print("Total Time = ", (end_time - start_time)*1000000, " Milliseconds")
 
 if __name__ == "__main__":
         
