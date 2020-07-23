@@ -158,7 +158,11 @@ class CPU:
 
             use_branch_table = True
             if use_branch_table == True:
-                self.branchtable[IR](operand_a, operand_b)
+                try:
+                    self.branchtable[IR](operand_a, operand_b)
+                except:
+                    print(f"Instruction {IR} not found. Exiting with code 1")
+                    sys.exit(1)
             else:
                 # O(n) performance. 
                 if IR == 0b00000001:
