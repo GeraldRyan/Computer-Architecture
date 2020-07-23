@@ -27,6 +27,7 @@ class CPU:
         self.branchtable[0b01000101] = self.push
         self.branchtable[0b01000110] = self.pop
         self.branchtable[0b01010000] = self.call_sub
+        self.branchtable[0b00010001] = self.return_sub
         
 
     def push(self, reg_num, null):
@@ -42,9 +43,24 @@ class CPU:
     def ram_read(self, MAR):
         return self.ram[MAR]
 
-    def call_sub(self, operand_a, null):
+    def call_sub(self, register, flag):
         print("You called me")
         
+        # Get address of next instruction
+        # return_addr = self.pc + 2 # because the call takes one argument 
+        # push on Stack
+        self.register[self.sp] -= 1
+        address_to_push_to = self.register[self.sp]
+        self.ram[address_to_push_to] = self.pc + 2 # = return_addr
+
+        # set pc to subroutine address
+        # reg_num = self.ram[pc + 1] == register  
+        subroutine_addr = self.register[register]
+
+        pc = subroutine_addr
+
+    def return_sub(self, null, null2):
+        pass
 
     def ram_write(self, MDR, MAR):
         try:
@@ -158,8 +174,8 @@ class CPU:
 
             IR = self.ram[self.pc]
             operand_a = self.ram[self.pc+1]; operand_b = self.ram[self.pc+2]; # print("IR", IR, "operand A/B", operand_a, operand_b)
-            a = format(IR, '08b')[:2]; b = format(IR, '08b')[2:3]; c = format(IR, '08b')[2:][3:4]; d = format(IR, '08b')[2:][4:]
-            # print(f"a: {a}, b: {b}, c: {c}, d: {d}")
+            a = format(IR, '08b')[:2]; b = format(IR, '08b')[2:3]; c = format(IR, '08b')[3:4]; d = format(IR, '08b')[4:]
+            # print(f"IR: {format(IR, '08b')} a: {a}, b: {b}, c: {c}, d: {d}")
             number_operands = (IR & 0b11000000) >> 6
 
             # self.pc += int(a,2) + 1 # Naive implementation
@@ -168,6 +184,9 @@ class CPU:
             use_branch_table = True
             if use_branch_table == True:
                 try:
+                    if IR == 0b01010000:
+                        operand_b = c
+                        print("c", c)
                     self.branchtable[IR](operand_a, operand_b)
                 except:
                     print(f"Instruction {IR} not found. Exiting with code 1")
