@@ -2,6 +2,8 @@
 
 import sys
 import time
+import code 
+
 
 start_time = time.time()
 print("start time", start_time)
@@ -24,6 +26,8 @@ class CPU:
         self.branchtable[0b10100000] = self.add
         self.branchtable[0b01000101] = self.push
         self.branchtable[0b01000110] = self.pop
+        self.branchtable[0b01010000] = self.call_sub
+        
 
     def push(self, reg_num, null):
         
@@ -38,6 +42,9 @@ class CPU:
     def ram_read(self, MAR):
         return self.ram[MAR]
 
+    def call_sub(self, operand_a, null):
+        print("You called me")
+        
 
     def ram_write(self, MDR, MAR):
         try:
@@ -59,7 +66,7 @@ class CPU:
         self.alu("ADD", op_a, op_b)
 
 
-    def load(self):
+    def load(self, argv=None):
         """Load a program into memory."""
 
         address = 0
@@ -77,8 +84,10 @@ class CPU:
         ]
 
         try: # Why is this try except block not working?
-            print("sys", sys.argv[1])
-            with open(sys.argv[1]) as f:
+            if argv is None:
+                argv = sys.argv[1]
+            print("sys", argv)
+            with open(argv) as f:
                 program.clear()
                 for line in f:
                     line = line.split("#")[0] # wrap inside int() when all input is right type
@@ -162,7 +171,7 @@ class CPU:
                     self.branchtable[IR](operand_a, operand_b)
                 except:
                     print(f"Instruction {IR} not found. Exiting with code 1")
-                    sys.exit(1)
+                    # sys.exit(1)
             else:
                 # O(n) performance. 
                 if IR == 0b00000001:
@@ -184,6 +193,7 @@ class CPU:
 end_time = time.time()
 print("Total Time = ", (end_time - start_time)*1000000, " Milliseconds")
 
+
 if __name__ == "__main__":
         
     cpu = CPU()
@@ -191,11 +201,12 @@ if __name__ == "__main__":
     cpu.ram_write(5,4)
     print(cpu.ram_read(4))
     cpu.run()
-    while True:
-        x = input("Enter a command: ")
-        if x == 'q':
-            quit()
-        try:
-            x
-        except:
-            print("error")
+    code.interact(local=globals())
+    # while True:
+    #     x = input("Enter a command: ")
+    #     if x == 'q':
+    #         quit()
+    #     try:
+    #         x
+    #     except:
+    #         print("error")
