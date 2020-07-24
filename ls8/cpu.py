@@ -73,6 +73,7 @@ class CPU:
 
     def CMP(self, operand_a, operand_b):
         # `FL` bits: `00000LGE`
+        self.flags = 0b00000000
         if self.register[operand_a] < self.register[operand_b]:
             self.flags = 0b00000100
             print(f"{operand_a} is address of reg a and {self.register[operand_a]} is its value. Operand A Less than B and the flag is {self.flags}")
