@@ -17,7 +17,7 @@ class CPU:
         self.register[7] = 0xf4 # Stack Pointer (initialized to f4)
         self.pc = 0
         self.sp = 7
-        self.flag = 0b00000000
+        self.flags = 0b00000000
         self.branchtable = {}
         self.running = True
         self.branchtable[0b00000001] = self.halt
@@ -32,6 +32,16 @@ class CPU:
         self.branchtable[0b10100111] = self.CMP
         
     def CMP(self, operand_a, operand_b):
+        # `FL` bits: `00000LGE`
+        if operand_a < operand_b:
+            print(" A Greater than B")
+            self.flags = 0b00000100
+        elif operand_a > operand_b:
+            self.flags = 0b00000010
+        else:
+            self.flags = 0b00000001
+            print("Equal", self.flags)
+
 
 
     def push(self, reg_num, stack=False):
@@ -94,6 +104,7 @@ class CPU:
         """Load a program into memory."""
 
         address = 0
+        self.pc = 0
 
         # For now, we've just hardcoded a program:
         
@@ -108,20 +119,18 @@ class CPU:
         ]
 
         try: # Why is this try except block not working?
-            if argv is None:
-                argv = sys.argv[1]
-            print("sys", argv)
-            with open(argv) as f:
-                program.clear()
-                for line in f:
-                    line = line.split("#")[0] # wrap inside int() when all input is right type
-                    line = line.strip()
-                    # print(line)
-                    if line == "":
-                        continue
-                    line = int(line, 2)
-                    # print(repr("{0:b}".format(line)))
-                    program.append(line)
+            if argv is not None:
+                with open(argv) as f:
+                    program.clear()
+                    for line in f:
+                        line = line.split("#")[0] # wrap inside int() when all input is right type
+                        line = line.strip()
+                        # print(line)
+                        if line == "":
+                            continue
+                        line = int(line, 2)
+                        # print(repr("{0:b}".format(line)))
+                        program.append(line)
         except IndexError:
             print("Please enter a filepath")
             sys.exit(1)
@@ -131,6 +140,7 @@ class CPU:
 
         for instruction in program:
             self.ram[address] = instruction
+            # print("Program Instruction", instruction)
             address += 1
 
 
@@ -171,13 +181,16 @@ class CPU:
     def run(self):
         """Run the CPU."""
         # Set up the operands and increment the pc
+        self.pc = 0
+        self.running = True
 
         
         # Run the instructions
         while self.running:
 
             if self.pc > len(self.ram)-3: ## safeguard. May not be necessary. HAVE TO USE format() NOT bin() or gets messed up. 
-                print("Stack Overflow! Program Terminated")
+                print("Stack Overflow! Program Terminated. PC reinitialized")
+                self.pc = 0
                 break
 
             IR = self.ram[self.pc]
@@ -188,7 +201,7 @@ class CPU:
 
             # self.pc += int(a,2) + 1 # Naive implementation
             self.pc += number_operands + 1
-
+            # print(f'self.pc {self.pc} and IR {IR}')
             use_branch_table = True
             if use_branch_table == True:
                 try:
@@ -223,9 +236,7 @@ print("Total Time = ", (end_time - start_time)*1000000, " Milliseconds")
 if __name__ == "__main__":
         
     cpu = CPU()
-    print(cpu.ram_read(4))
-    cpu.ram_write(5,4)
-    print(cpu.ram_read(4))
+    cpu.load()
     cpu.run()
     code.interact(local=globals())
     # while True:
