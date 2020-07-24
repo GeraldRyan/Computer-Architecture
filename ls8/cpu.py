@@ -17,6 +17,7 @@ class CPU:
         self.register[7] = 0xf4 # Stack Pointer (initialized to f4)
         self.pc = 0
         self.sp = 7
+        self.flag = 0b00000000
         self.branchtable = {}
         self.running = True
         self.branchtable[0b00000001] = self.halt
@@ -28,7 +29,10 @@ class CPU:
         self.branchtable[0b01000110] = self.pop
         self.branchtable[0b01010000] = self.call_sub
         self.branchtable[0b00010001] = self.return_sub
+        self.branchtable[0b10100111] = self.CMP
         
+    def CMP(self, operand_a, operand_b):
+
 
     def push(self, reg_num, stack=False):
         
