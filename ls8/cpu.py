@@ -31,8 +31,36 @@ class CPU:
         self.branchtable[0b00010001] = self.return_sub
         self.branchtable[0b10100111] = self.CMP
         self.branchtable[0b01010100] = self.JMP
+        self.branchtable[0b01010110] = self.JNE
+        self.branchtable[0b01010101] = self.JEQ
 
+
+    def JNE(self, operand_a, knot_used):
+        # If `E` flag is clear (false, 0), jump to the address stored in the given register.
+        mask = 0b00000001
+        result = mask & self.flags
+        print("Result of bitwise", result)
+        print("operand a", operand_a)
+        if result == 0: 
+            print("JNE Result Not equal. The flag is set to not equal. In this case this means jump")
+            self.JMP(operand_a, "knots berry farm")
+        else:
+            print("JNE result equal, so in this case don't jump  ")
         
+    
+    
+    def JEQ(self, operand_a, knot_used):
+        mask = 0b00000001
+        result = mask & self.flags
+        print("operand a", operand_a)
+        if result == 1:
+            print("JEQ result equal so jump")
+            self.JMP(operand_a, None)
+        else:
+            print("JEQ result not equal so don't jump")
+
+
+
     def JMP(self, operand_a, knot_used):
         # Jump (set the pc) to address stored in operand_a
         # print(f"self.register {self.register} and operand_a {operand_a}")
