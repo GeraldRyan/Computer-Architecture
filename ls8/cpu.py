@@ -33,14 +33,15 @@ class CPU:
         
     def CMP(self, operand_a, operand_b):
         # `FL` bits: `00000LGE`
-        if operand_a < operand_b:
-            print(" A Greater than B")
+        if self.register[operand_a] < self.register[operand_b]:
             self.flags = 0b00000100
-        elif operand_a > operand_b:
+            print(f"{operand_a} is address of reg a and {self.register[operand_a]} is its value. Operand A Less than B and the flag is {self.flags}")
+        elif self.register[operand_a] > self.register[operand_b]:
             self.flags = 0b00000010
+            print(f" A Greater than B and the flag is {self.flags}")
         else:
             self.flags = 0b00000001
-            print("Equal", self.flags)
+            print("Two registers are Equal", self.flags)
 
 
 
@@ -174,7 +175,7 @@ class CPU:
         ), end='')
 
         for i in range(8):
-            print(" %02X" % self.reg[i], end='')
+            print(" %02X" % self.register[i], end='')
 
         print()
 
