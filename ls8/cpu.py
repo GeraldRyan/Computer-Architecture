@@ -30,7 +30,19 @@ class CPU:
         self.branchtable[0b01010000] = self.call_sub
         self.branchtable[0b00010001] = self.return_sub
         self.branchtable[0b10100111] = self.CMP
+        self.branchtable[0b01010100] = self.JMP
+
         
+    def JMP(self, operand_a, knot_used):
+        # Jump (set the pc) to address stored in operand_a
+        # print(f"self.register {self.register} and operand_a {operand_a}")
+        # print(f'self.ram {self.ram}')
+        print(f"old PC = {self.pc}")
+        self.pc = self.register[operand_a]
+        print(f"New PC = {self.pc}")
+
+        
+
     def CMP(self, operand_a, operand_b):
         # `FL` bits: `00000LGE`
         if self.register[operand_a] < self.register[operand_b]:
@@ -89,7 +101,11 @@ class CPU:
             return False
 
     def load_reg(self, op_a, op_b):
-        self.register[int(format(op_a, '08b')[-3:])] = op_b
+        # print(int(format(op_a, '08b')[-3:]))
+        # print(op_b)
+        self.register[op_a] = op_b
+        print(self.register)
+        # self.register[int(format(op_a, '08b')[-3:])] = op_b
 
     def print_reg(self, op_a, null):
         print(f"Value in register {op_a}: {self.register[op_a]}")
