@@ -30,10 +30,16 @@ class CPU:
         self.branchtable[0b00010001] = self.return_sub
         
 
-    def push(self, reg_num, null):
+    def push(self, reg_num, stack=False):
         
         self.register[self.sp] -= 1 # Decrement stack pointer
-        self.ram[self.register[self.sp]] = self.register[reg_num]
+        print(f"self.ram[self.register[self.sp]] ] {reg_num}")
+
+        # print(f"self.ram[self.register[self.sp]] {self.ram[self.register[self.sp]]}     self.register[reg_num]{self.register[reg_num]}")
+        if stack==True: # Sets registers
+            print("Hello World")
+        else: # Sets memory addresses
+            self.ram[self.register[self.sp]] = self.register[reg_num]
 
     def pop(self, reg, null):
 
@@ -43,24 +49,22 @@ class CPU:
     def ram_read(self, MAR):
         return self.ram[MAR]
 
-    def call_sub(self, register, flag):
-        print("You called me")
-        
-        # Get address of next instruction
-        # return_addr = self.pc + 2 # because the call takes one argument 
-        # push on Stack
-        self.register[self.sp] -= 1
-        address_to_push_to = self.register[self.sp]
-        self.ram[address_to_push_to] = self.pc + 2 # = return_addr
+    def call_sub(self, op_a, flag): # instruction 80
+        print("You called call")
+        # self.push(self.pc, True)
 
-        # set pc to subroutine address
-        # reg_num = self.ram[pc + 1] == register  
-        subroutine_addr = self.register[register]
+        self.register[7] -= 1 
+        self.ram[self.register[self.sp]] = self.pc
 
-        pc = subroutine_addr
+        self.pc = self.register[op_a]
 
     def return_sub(self, null, null2):
-        pass
+        # get return address from top of stack
+        # print("Hello World")
+        self.pc = self.ram[self.register[7]]
+        print("Self pc", self.pc)
+        self.register[7] += 1
+
 
     def ram_write(self, MDR, MAR):
         try:
@@ -184,11 +188,10 @@ class CPU:
             use_branch_table = True
             if use_branch_table == True:
                 try:
-                    if IR == 0b01010000:
+                    if IR == 0b01010000 or IR == 0b00010001:
                         operand_b = c
-                        print("c", c)
                     self.branchtable[IR](operand_a, operand_b)
-                except:
+                except KeyError:
                     print(f"Instruction {IR} not found. Exiting with code 1")
                     # sys.exit(1)
             else:
