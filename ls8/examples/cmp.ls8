@@ -1,0 +1,26 @@
+# Print the number 8
+
+# This comment and blank line is here to make sure
+# they are handled correctly by the file reading code.
+
+10000010 # LDI R0,8
+00000000
+00001000
+01000111 # PRN R0
+00000000
+10000010 # LDI R1,10
+00000001
+00001010
+10100111 # CMP
+00000000
+00000001
+
+# 10000010 # LDI R3,8  ---- creates an infinite loop
+# 00000011
+# 00001000
+# 01010100 # JMP
+# 00000011   
+#----- End infinite loop creation
+
+00000001 # HLT
+# [10000010,00000000,00001000,01000111,00000000,10000010,00000001,00001010,10100111,00000000,00000001,00000001]
